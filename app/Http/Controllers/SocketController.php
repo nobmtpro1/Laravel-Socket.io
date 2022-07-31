@@ -5,8 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\User;
-use JWTAuth;
-use JWTFactory;
+use App\Services\JwtService;
 
 class SocketController extends Controller
 {
@@ -36,7 +35,11 @@ class SocketController extends Controller
     {
         $user = User::first();
 
-        $token = JWTAuth::claims($user->toArray())->attempt(['email' => 'nobmtpro1@gmail.com', 'password' => 123]);
+        $key = env('JWT_SECRET');
+        // $token = JWTAuth::claims($user->toArray())->attempt(['email' => 'nobmtpro1@gmail.com', 'password' => 123]);
+        $token = JwtService::generate($user, $key);
+
+        // return JwtService::validate($token, $key);
 
         return response()->json([
             'access_token' => $token,
