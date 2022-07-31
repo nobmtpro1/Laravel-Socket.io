@@ -10,9 +10,16 @@
     </div>
 </div>
 <script>
-    const socket = io("http://localhost:8890");
-    socket.on('chat', function(data) {
-        console.log(data)
-        $("#messages").append("<p>" + data + "</p>");
-    });
+    var userId = 1
+    $.get('gettoken', {}, function(data) {
+        const socket = io("http://localhost:8890", {
+            auth: {
+                token: data.access_token
+            }
+        });
+        socket.on('private.chat.' + userId, function(data) {
+            console.log(data)
+            $("#messages").append("<p>" + data + "</p>");
+        });
+    })
 </script>

@@ -7,6 +7,7 @@
                     <input type="text" name="message">
                     <input type="submit" value="send">
                 </form>
+                <br>
             </div>
         </div>
     </div>

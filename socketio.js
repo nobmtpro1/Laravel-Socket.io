@@ -1,9 +1,25 @@
 const redis = require("redis");
+require("dotenv").config();
+const jwt = require("jsonwebtoken");
 const httpServer = require("http").createServer();
 const io = require("socket.io")(httpServer, {
     cors: {
         origin: "*",
     },
+});
+
+io.use((socket, next) => {
+    const token = socket.handshake.auth.token;
+    if (token) {
+        jwt.verify(token, process.env.JWT_SECRET, function (err, decoded) {
+            if (err) return next(new Error("Authentication error"));
+            socket.auth = decoded;
+            console.log(decoded);
+            next();
+        });
+    } else {
+        next(new Error("Authentication error"));
+    }
 });
 
 io.on("connection", async (socket) => {
@@ -18,8 +34,13 @@ io.on("connection", async (socket) => {
 
     await redisClient.connect();
 
-    await redisClient.pSubscribe("*", (message, channel) => {
-        console.log(message, channel);
+    await redisClient.pSubscribe("private.chat.*", (message, channel) => {
+        if (channel == "private.chat." + socket.auth.id) {
+            socket.emit(channel, message);
+        }
+    });
+
+    await redisClient.pSubscribe("public.*", (message, channel) => {
         socket.emit(channel, message);
     });
 

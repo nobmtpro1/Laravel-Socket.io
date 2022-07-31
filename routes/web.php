@@ -21,4 +21,5 @@ Route::group(['namespace' => 'App\Http\Controllers'], function () {
     Route::get('socket', 'SocketController@index');
     Route::post('sendmessage', 'SocketController@sendMessage');
     Route::get('writemessage', 'SocketController@writemessage');
+    Route::get('gettoken', 'SocketController@gettoken');
 });
