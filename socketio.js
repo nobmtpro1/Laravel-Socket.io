@@ -34,11 +34,12 @@ io.on("connection", async (socket) => {
 
     await redisClient.connect();
 
-    await redisClient.pSubscribe("private.chat.*", (message, channel) => {
-        if (channel == "private.chat." + socket.auth.id) {
+    await redisClient.pSubscribe(
+        "private.chat." + socket.auth.id,
+        (message, channel) => {
             socket.emit(channel, message);
         }
-    });
+    );
 
     await redisClient.pSubscribe("public.*", (message, channel) => {
         socket.emit(channel, message);
